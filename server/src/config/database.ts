@@ -1,19 +1,43 @@
 
 import mongoose from "mongoose";
 
-const connectDatabase = async (): Promise<void> => {
-  try {
-    const connection = await mongoose.connect(
-      process.env.MONGODB_URI as string
-    );
+let connectionPromise: Promise<typeof mongoose> | null = null;
 
-    console.log(
-      `MongoDB connected: ${connection.connection.host}`
-    );
-  } catch (error) {
-    console.error("MongoDB connection failed:", error);
-    process.exit(1);
+const connectDatabase = async (): Promise<typeof mongoose> => {
+  const mongoUri = process.env.MONGODB_URI;
+
+  if (!mongoUri) {
+    throw new Error("MONGODB_URI is not defined");
   }
+
+  // Reuse an existing connection
+  if (mongoose.connection.readyState === 1) {
+    return mongoose;
+  }
+
+  // Reset a stale connection promise after disconnection
+  if (mongoose.connection.readyState === 0) {
+    connectionPromise = null;
+  }
+
+  // Reuse an ongoing connection attempt
+  if (!connectionPromise) {
+    connectionPromise = mongoose
+      .connect(mongoUri)
+      .then((connection) => {
+        console.log(
+          `MongoDB connected: ${connection.connection.host}`
+        );
+
+        return connection;
+      })
+      .catch((error: unknown) => {
+        connectionPromise = null;
+        throw error;
+      });
+  }
+
+  return connectionPromise;
 };
 
 export default connectDatabase;
