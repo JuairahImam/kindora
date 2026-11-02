@@ -42,6 +42,15 @@ app.use("/api", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
 
+// Root API
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "Kindora API is running successfully!",
+    health: "/health",
+  });
+});
+
 // Health Check API
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({
