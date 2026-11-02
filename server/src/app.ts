@@ -9,6 +9,7 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./modules/user/user.route.js";
+import eventRoutes from "./modules/event/event.route.js";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(async (_req, _res, next) => {
 // API Routes
 app.use("/api", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
 
 // Health Check API
 app.get("/health", (_req: Request, res: Response) => {
