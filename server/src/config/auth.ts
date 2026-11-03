@@ -52,6 +52,7 @@ export const auth = betterAuth({
   // MongoDB database
   database: mongodbAdapter(database, {
     client,
+    transaction: false,
   }),
 
   // GitHub OAuth

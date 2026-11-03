@@ -19,6 +19,11 @@ const futureEventDateSchema = z.iso.datetime().refine(
   }
 );
 
+const imageValidationSchema = z.string().refine(
+  (val) => /^https?:\/\//i.test(val) || val.startsWith("data:image/"),
+  { message: "Must be a valid image URL or uploaded image" }
+);
+
 // Create Event Validation
 const createEventSchema = z
   .object({
@@ -28,7 +33,7 @@ const createEventSchema = z
 
     eventType: z.enum(eventTypes),
 
-    thumbnail: z.string().url(),
+    thumbnail: imageValidationSchema,
 
     location: z.string().trim().min(3).max(150),
 
@@ -45,7 +50,7 @@ const updateEventSchema = z
 
     eventType: z.enum(eventTypes).optional(),
 
-    thumbnail: z.string().url().optional(),
+    thumbnail: imageValidationSchema.optional(),
 
     location: z.string().trim().min(3).max(150).optional(),
 

@@ -1,69 +1,75 @@
+import type { Request, Response, NextFunction } from "express";
+import { fromNodeHeaders } from "better-auth/node";
+import { auth } from "../config/auth.js";
 
-import type {
-    Request,
-    Response,
-    NextFunction,
-  } from "express";
-  
-  import { auth } from "../config/auth.js";
-  
-  const authMiddleware = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      // Get Authorization header
-      const authorization = req.headers.authorization;
-  
-      // Check Bearer token
-      if (!authorization || !authorization.startsWith("Bearer ")) {
-        res.status(401).json({
-          success: false,
-          message: "Authorization token is required",
-        });
-        return;
+const authMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authorization = req.headers.authorization;
+    let jwtPayload: any = null;
+
+    // 1. Try Bearer token if present (JWT verification)
+    if (authorization && authorization.startsWith("Bearer ")) {
+      const token = authorization.split(" ")[1]?.trim();
+      if (token && token !== "null" && token !== "undefined") {
+        try {
+          const result = await auth.api.verifyJWT({
+            body: {
+              token,
+            },
+          });
+          if (result && result.payload) {
+            jwtPayload = result.payload;
+          }
+        } catch {
+          // Fall back to session check
+        }
       }
-  
-      // Extract JWT
-      const token = authorization.split(" ")[1];
-  
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          message: "Invalid authorization token",
-        });
-        return;
-      }
-  
-      // Verify JWT using Better Auth
-      const result = await auth.api.verifyJWT({
-        body: {
-          token,
-        },
+    }
+
+    // 2. Fallback: check session via Better Auth (cookies or headers)
+    if (!jwtPayload) {
+      const session = await auth.api.getSession({
+        headers: fromNodeHeaders(req.headers),
       });
-  
-      // Reject invalid JWT
-      if (!result.payload) {
-        res.status(401).json({
-          success: false,
-          message: "Invalid or expired JWT",
-        });
-        return;
+
+      if (session && session.user) {
+        const userId = String(session.user.id || (session.user as any)._id);
+        jwtPayload = {
+          sub: userId,
+          id: userId,
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image,
+        };
       }
-  
-      // Store verified JWT payload
-      res.locals.jwtPayload = result.payload;
-  
-      next();
-    } catch (error) {
-      // Invalid JWT or verification error
+    }
+
+    // Reject if neither Bearer JWT nor Session is valid
+    if (!jwtPayload) {
       res.status(401).json({
         success: false,
-        message: "Invalid or expired JWT",
+        message: "Unauthorized. Please login first.",
       });
+      return;
     }
-  };
-  
-  export default authMiddleware;
-  
+
+    // Ensure sub and id are populated
+    if (!jwtPayload.sub && jwtPayload.id) {
+      jwtPayload.sub = jwtPayload.id;
+    }
+
+    res.locals.jwtPayload = jwtPayload;
+    next();
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Authentication failed. Please login first.",
+    });
+  }
+};
+
+export default authMiddleware;
