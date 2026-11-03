@@ -2,14 +2,21 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { IUser } from "@/types/user";
-import { API_BASE_URL } from "@/lib/api";
+import { getApiBaseUrl } from "@/lib/api";
 
 interface AuthContextType {
   user: IUser | null;
   token: string | null;
   loading: boolean;
-  login: (token: string, user: IUser) => void;
-  logout: () => void;
+  loginWithEmail: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  registerWithEmail: (
+    name: string,
+    email: string,
+    password: string,
+    photoURL?: string
+  ) => Promise<{ success: boolean; message?: string }>;
+  loginWithGitHub: () => void;
+  logout: () => Promise<void>;
   updateUser: (user: Partial<IUser>) => void;
 }
 
@@ -20,31 +27,68 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Check existing session on mount
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        const baseUrl = getApiBaseUrl();
         const storedToken =
-          localStorage.getItem("kindora_token") ||
-          sessionStorage.getItem("kindora_token");
-        const storedUser = localStorage.getItem("kindora_user");
+          typeof window !== "undefined"
+            ? localStorage.getItem("kindora_token") || sessionStorage.getItem("kindora_token")
+            : null;
+        const storedUser =
+          typeof window !== "undefined" ? localStorage.getItem("kindora_user") : null;
 
         if (storedToken && storedUser) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          try {
+            setToken(storedToken);
+            setUser(JSON.parse(storedUser));
+          } catch {
+            localStorage.removeItem("kindora_user");
+          }
         }
 
-        // Validate session with server if token exists
-        if (storedToken) {
-          const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-            },
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data?.data) {
-              setUser(data.data);
-              localStorage.setItem("kindora_user", JSON.stringify(data.data));
+        // Only verify with server if a token/user was stored or after OAuth redirect
+        const hasSessionIndicator =
+          Boolean(storedToken) ||
+          Boolean(storedUser) ||
+          (typeof window !== "undefined" &&
+            (window.location.search.includes("code=") ||
+              window.location.search.includes("state=")));
+
+        if (!hasSessionIndicator) {
+          setLoading(false);
+          return;
+        }
+
+        // Verify with server using cookies/headers
+        const res = await fetch(`${baseUrl}/api/me`, {
+          credentials: "include",
+          headers: storedToken
+            ? {
+                Authorization: `Bearer ${storedToken}`,
+              }
+            : {},
+        }).catch(() => null);
+
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data?.user) {
+            setUser(data.user);
+            localStorage.setItem("kindora_user", JSON.stringify(data.user));
+
+            // Fetch JWT token if not yet stored
+            if (!storedToken) {
+              const tokenRes = await fetch(`${baseUrl}/api/auth/token`, {
+                credentials: "include",
+              }).catch(() => null);
+              if (tokenRes && tokenRes.ok) {
+                const tokenData = await tokenRes.json();
+                if (tokenData?.token) {
+                  setToken(tokenData.token);
+                  localStorage.setItem("kindora_token", tokenData.token);
+                }
+              }
             }
           }
         }
@@ -58,19 +102,166 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
   }, []);
 
-  const login = (newToken: string, newUser: IUser) => {
-    setToken(newToken);
-    setUser(newUser);
-    localStorage.setItem("kindora_token", newToken);
-    localStorage.setItem("kindora_user", JSON.stringify(newUser));
+  // Email and Password Login
+  const loginWithEmail = async (email: string, password: string) => {
+    try {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/auth/sign-in/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        return {
+          success: false,
+          message:
+            data?.message ||
+            data?.error?.message ||
+            "Invalid email or password. Please try again.",
+        };
+      }
+
+      // Extract user
+      const authUser: IUser = {
+        id: data?.user?.id || data?.user?._id,
+        _id: data?.user?._id || data?.user?.id,
+        name: data?.user?.name,
+        email: data?.user?.email,
+        image: data?.user?.image,
+        emailVerified: data?.user?.emailVerified,
+      };
+
+      // Extract or fetch JWT Token
+      let jwtToken = data?.token;
+      if (!jwtToken) {
+        const tokenRes = await fetch(`${baseUrl}/api/auth/token`, {
+          credentials: "include",
+        }).catch(() => null);
+        if (tokenRes && tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          jwtToken = tokenData?.token;
+        }
+      }
+
+      if (jwtToken) {
+        setToken(jwtToken);
+        localStorage.setItem("kindora_token", jwtToken);
+      }
+
+      setUser(authUser);
+      localStorage.setItem("kindora_user", JSON.stringify(authUser));
+
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : "Network error occurred",
+      };
+    }
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("kindora_token");
-    localStorage.removeItem("kindora_user");
-    sessionStorage.removeItem("kindora_token");
+  // Register with Email and Password
+  const registerWithEmail = async (
+    name: string,
+    email: string,
+    password: string,
+    photoURL?: string
+  ) => {
+    try {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/auth/sign-up/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          image: photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        let msg = data?.message || data?.error?.message;
+        if (res.status === 422 || msg?.toLowerCase().includes("already exists")) {
+          msg = "An account with this email already exists. Please log in instead.";
+        }
+        return {
+          success: false,
+          message: msg || "Registration failed. Please check your details.",
+        };
+      }
+
+      const authUser: IUser = {
+        id: data?.user?.id || data?.user?._id,
+        _id: data?.user?._id || data?.user?.id,
+        name: data?.user?.name || name,
+        email: data?.user?.email || email,
+        image: data?.user?.image || photoURL,
+        emailVerified: data?.user?.emailVerified,
+      };
+
+      // Get JWT Token
+      let jwtToken = data?.token;
+      if (!jwtToken) {
+        const tokenRes = await fetch(`${baseUrl}/api/auth/token`, {
+          credentials: "include",
+        }).catch(() => null);
+        if (tokenRes && tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          jwtToken = tokenData?.token;
+        }
+      }
+
+      if (jwtToken) {
+        setToken(jwtToken);
+        localStorage.setItem("kindora_token", jwtToken);
+      }
+
+      setUser(authUser);
+      localStorage.setItem("kindora_user", JSON.stringify(authUser));
+
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : "Network error occurred",
+      };
+    }
+  };
+
+  // GitHub OAuth Login
+  const loginWithGitHub = () => {
+    const baseUrl = getApiBaseUrl();
+    const callbackURL = typeof window !== "undefined" ? window.location.origin : "";
+    window.location.href = `${baseUrl}/api/auth/sign-in/social?provider=github&callbackURL=${encodeURIComponent(callbackURL)}`;
+  };
+
+  // Logout
+  const logout = async () => {
+    try {
+      const baseUrl = getApiBaseUrl();
+      await fetch(`${baseUrl}/api/auth/sign-out`, {
+        method: "POST",
+        credentials: "include",
+      }).catch(() => null);
+    } finally {
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem("kindora_token");
+      localStorage.removeItem("kindora_user");
+      sessionStorage.removeItem("kindora_token");
+    }
   };
 
   const updateUser = (updatedFields: Partial<IUser>) => {
@@ -84,7 +275,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, loading, login, logout, updateUser }}
+      value={{
+        user,
+        token,
+        loading,
+        loginWithEmail,
+        registerWithEmail,
+        loginWithGitHub,
+        logout,
+        updateUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
