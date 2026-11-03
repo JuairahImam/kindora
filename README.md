@@ -10,8 +10,8 @@
 - **Live Server (API URL):** [https://server-one-weld-92.vercel.app](https://server-one-weld-92.vercel.app)
 - **Local Server URL:** `http://localhost:5050`
 - **Server Health Check:** [https://server-one-weld-92.vercel.app/health](https://server-one-weld-92.vercel.app/health)
-- **Client Live Site URL:** *(Add your deployed Client URL here e.g. https://kindora.vercel.app)*
-- **GitHub Repository (Server):** `https://github.com/juairahnafisa/kindora`
+- **Client Live Site URL:** [https://client-five-phi-98.vercel.app](https://client-five-phi-98.vercel.app)
+- **GitHub Repository:** [https://github.com/JuairahImam/kindora](https://github.com/JuairahImam/kindora)
 
 ---
 

@@ -29,14 +29,25 @@ if (!githubClientId || !githubClientSecret) {
   );
 }
 
+const clientUrls = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((url) => url.trim())
+  .filter(Boolean);
+
+export const trustedOrigins = Array.from(
+  new Set([
+    "http://localhost:3000",
+    "https://client-five-phi-98.vercel.app",
+    ...clientUrls,
+  ])
+);
+
 // Better Auth configuration
 export const auth = betterAuth({
   baseURL,
   secret,
 
-  trustedOrigins: [
-    process.env.CLIENT_URL || "http://localhost:3000",
-  ],
+  trustedOrigins,
 
   // MongoDB database
   database: mongodbAdapter(database, {

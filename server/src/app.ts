@@ -1,10 +1,9 @@
-
 import express, { type Request, type Response } from "express";
 import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
 
 import connectDatabase from "./config/database.js";
-import { auth } from "./config/auth.js";
+import { auth, trustedOrigins } from "./config/auth.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
 import authRoutes from "./routes/auth.routes.js";
@@ -13,10 +12,21 @@ import eventRoutes from "./modules/event/event.route.js";
 
 const app = express();
 
-// CORS Middleware
+// CORS Middleware supporting local and live client domains
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, Postman)
+      if (
+        !origin ||
+        trustedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS origin not allowed: ${origin}`));
+      }
+    },
     credentials: true,
   })
 );

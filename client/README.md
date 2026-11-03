@@ -7,7 +7,7 @@
 
 ## 🌐 Live URLs & Links
 
-- **Client Live Site URL:** [https://kindora-client.vercel.app](https://kindora-client.vercel.app) *(Deploy link)*
+- **Client Live Site URL:** [https://client-five-phi-98.vercel.app](https://client-five-phi-98.vercel.app)
 - **Live API Server:** [https://server-one-weld-92.vercel.app](https://server-one-weld-92.vercel.app)
 - **Local Dev URL:** `http://localhost:3000`
 - **GitHub Repository (Client):** `https://github.com/JuairahImam/kindora`
