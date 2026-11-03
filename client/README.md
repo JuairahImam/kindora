@@ -1,60 +1,50 @@
-# 🌟 Kindora — Social Development Events Platform (Client)
+# Kindora — Social Development Events Platform
 
-> **"Small Acts. Greater Impact."**  
-> Kindora is a community-driven event management platform where citizens, volunteers, and organizers can discover, organize, join, and track local social welfare and community development initiatives.
+> **Live Site:** https://client-five-phi-98.vercel.app
 
----
-
-## 🌐 Live URLs & Links
-
-- **Client Live Site URL:** [https://client-five-phi-98.vercel.app](https://client-five-phi-98.vercel.app)
-- **Live API Server:** [https://server-one-weld-92.vercel.app](https://server-one-weld-92.vercel.app)
-- **Local Dev URL:** `http://localhost:3000`
-- **GitHub Repository (Client):** `https://github.com/JuairahImam/kindora`
+A community-driven event management platform where citizens create, join, and track grassroots social service events across Bangladesh.
 
 ---
 
-## 🚀 Key Website Features
+## ✨ Key Features
 
-* **🌟 Dynamic Community Homepage:** Features a warm, inspiring "Golden Hour" themed hero banner, interactive value-proposition cards, a live database-backed Recent Upcoming Events section showcasing 6 upcoming drives via MongoDB `.limit(6)`, a curated visual gallery of grassroots moments, and a newsletter subscription portal.
-* **📅 Real-Time Event Discovery & Filtering:** Explore community-led initiatives (Tree Plantation, Blanket Distribution, Street Cleanups, Medical Camps) with automatic date filtering that guarantees past events never appear in the upcoming feed.
-* **🤝 One-Click Volunteer Enrollment:** Logged-in changemakers can join causes instantly with atomic duplicate join prevention, participant tracking, and real-time organizer coordination.
-* **🌓 System-Wide Light/Dark Theme Customization:** A persistent theme toggler with accessible contrast, smooth transitions, and Golden Hour coral/sand/ink-navy color tokens that seamlessly transforms the entire UI.
-* **🔐 Secure Authentication & Role Protected Experience:** Powered by Better Auth with email/password validation (min 6 characters, uppercase & lowercase enforcement) and GitHub OAuth, safeguarding event creation, personal event management, and joined events history with JWT tokens.
+- 🔐 **Secure Authentication** — Email/password signup & login with GitHub OAuth via Better Auth. Password strength validation (uppercase, lowercase, min 6 chars) with real-time inline feedback. JWT-protected private API routes.
 
----
+- 📅 **Create & Manage Events** — Logged-in users can create community events (Cleanup, Donation, Plantation, Education, Healthcare, Food Distribution) with title, description, location, future-only date picker, and thumbnail. Manage your events with inline edit modal and SweetAlert2-confirmed delete.
 
-## 🛠️ Technology Stack
+- 🌍 **Discover & Join Events** — Browse all upcoming events with category filter chips and live search. Click any event to view full details and join with one click. Joined events are tracked per-user and sorted by date on the Joined Events page.
 
-- **Framework:** Next.js 16 (App Router)
-- **Library:** React 19
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS v4, Custom Design Tokens
-- **Icons:** Lucide React, Custom SVG Brand Logos (Modern X Logo, etc.)
-- **State & Context:** React Context API (ThemeContext, AuthContext)
-- **Deployment:** Vercel
+- 🌙 **Dark / Light Theme Toggle** — Full system-wide theme switching persisted to `localStorage` with smooth CSS variable transitions, respecting `prefers-color-scheme` on first visit.
+
+- 👤 **User Profile Management** — View and update your display name and profile photo URL. Profile photo previews inline before saving. Email address is non-editable for security.
+
+- 💪 **Responsive & Accessible Design** — Mobile-first layout that works on all screen sizes. Equal-height event cards in 1/2/3-column grids, skeleton loading states throughout, SweetAlert2 for all confirmations (no browser `alert()`).
 
 ---
 
-## 💻 Local Development Setup
+## 🛠 Tech Stack
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16 (App Router), TypeScript |
+| UI Components | HeroUI, Tailwind CSS v4, Lucide Icons |
+| Authentication | Better Auth (email + GitHub OAuth, JWT) |
+| Backend API | Express.js, MongoDB / Mongoose |
+| Hosting | Vercel (client + server) |
 
-2. Configure environment variables in `.env.local`:
-   ```env
-   NEXT_PUBLIC_API_URL=https://server-one-weld-92.vercel.app
-   ```
+---
 
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
+## 🚀 Getting Started
 
-4. Build for production:
-   ```bash
-   npm run build
-   npm start
-   ```
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Configure your `.env.local`:
+```
+NEXT_PUBLIC_API_URL=http://localhost:5050
+```
