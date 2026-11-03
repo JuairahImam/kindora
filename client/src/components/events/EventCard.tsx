@@ -39,6 +39,7 @@ export default function EventCard({ event }: EventCardProps) {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
+          unoptimized={imageSrc.startsWith("data:")}
           onError={() => {
             setImageSrc(
               "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=800&q=80"

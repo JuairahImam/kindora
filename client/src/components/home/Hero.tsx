@@ -21,25 +21,25 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             {/* Pill badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-theme-primary-soft text-theme-primary text-xs font-bold tracking-wide border border-theme-border shadow-xs">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Small Actions. Big Changes.</span>
+              <Sparkles className="w-3.5 h-3.5 text-theme-primary" />
+              <span>Empowering Grassroots Action Across Bangladesh</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-theme-heading leading-[1.12]">
-              Make a Difference, <br />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-theme-heading leading-[1.14]">
+              Empower Communities, <br />
               <span className="text-theme-primary underline decoration-amber-400 decoration-wavy decoration-2 underline-offset-8">
-                One Event
+                Transform Lives
               </span>{" "}
-              at a Time.
+              Together.
             </h1>
 
             {/* Subtitle */}
             <p className="text-base sm:text-lg text-theme-body leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              Kindora connects passionate local citizens with grassroots social
-              initiatives across Dhaka and beyond. Discover tree plantation
-              drives, winter clothes distributions, educational workshops, and
-              community cleanups in your neighborhood.
+              Kindora is your community-powered platform for meaningful social impact.
+              Connect with passionate local changemakers across Dhaka and beyond to
+              distribute winter aid, plant sustainable green canopies, provide youth literacy
+              workshops, and support neighborhood welfare drives.
             </p>
 
             {/* Buttons */}
@@ -60,23 +60,23 @@ export default function Hero() {
             </div>
 
             {/* Trust and community indicators */}
-            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-theme-border/80 max-w-lg mx-auto lg:mx-0 text-left">
-              <div className="flex items-center gap-2">
+            <div className="pt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-theme-border/80 max-w-lg mx-auto lg:mx-0 text-left">
+              <div className="flex items-center gap-2.5">
                 <HeartHandshake className="w-4 h-4 text-theme-primary shrink-0" />
-                <span className="text-xs font-medium text-theme-body">
-                  100% Grassroots
+                <span className="text-xs font-semibold text-theme-heading">
+                  100% Grassroots Impact
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <ShieldCheck className="w-4 h-4 text-amber-500 shrink-0" />
-                <span className="text-xs font-medium text-theme-body">
-                  Verified Causes
+                <span className="text-xs font-semibold text-theme-heading">
+                  Community Verified
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <Users className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span className="text-xs font-medium text-theme-body">
-                  Local Volunteers
+                <span className="text-xs font-semibold text-theme-heading">
+                  Active Volunteer Network
                 </span>
               </div>
             </div>
