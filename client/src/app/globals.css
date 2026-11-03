@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary: #E4572E;
+    --primary-action: #C23B13;
+    --primary-hover: #A82F0C;
+    --primary-soft: #FFEDE5;
+    --accent: #F2A93B;
+    --accent-soft: #FFF4DC;
+    --background: #FBF7F2;
+    --surface: #FFFFFF;
+    --heading: #1B2236;
+    --body: #566074;
+    --border: #E8E1D8;
+    --success: #1E8E5A;
+    --danger: #D32F2F;
+    --warning: #B7791F;
+  }
+
+  .dark {
+    --primary: #FF7A50;
+    --primary-action: #E4572E;
+    --primary-hover: #FF7A50;
+    --primary-soft: #3A211A;
+    --accent: #F5B94F;
+    --accent-soft: #33291A;
+    --background: #0F1424;
+    --surface: #171E33;
+    --heading: #F4F1EC;
+    --body: #A3ACC0;
+    --border: #27304A;
+    --success: #22C55E;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--body);
+    font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Inter", "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Custom theme utility classes */
+.bg-theme-bg {
+  background-color: var(--background);
+}
+
+.bg-theme-surface {
+  background-color: var(--surface);
+}
+
+.bg-theme-primary {
+  background-color: var(--primary);
+}
+
+.bg-theme-primary-action {
+  background-color: var(--primary-action);
+}
+
+.hover\:bg-theme-primary-hover:hover {
+  background-color: var(--primary-hover);
+}
+
+.bg-theme-primary-soft {
+  background-color: var(--primary-soft);
+}
+
+.bg-theme-accent {
+  background-color: var(--accent);
+}
+
+.bg-theme-accent-soft {
+  background-color: var(--accent-soft);
+}
+
+.text-theme-heading {
+  color: var(--heading);
+}
+
+.text-theme-body {
+  color: var(--body);
+}
+
+.text-theme-primary {
+  color: var(--primary);
+}
+
+.text-theme-accent {
+  color: var(--accent);
+}
+
+.border-theme-border {
+  border-color: var(--border);
+}
+
+/* Common components specified in design.md */
+.btn-primary {
+  background-color: var(--primary-action);
+  color: #ffffff;
+  border-radius: 12px;
+  height: 44px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--heading);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  height: 44px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--primary-soft);
+}
+
+/* Uniform card styling */
+.card-elevation {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 16px rgba(27, 34, 54, 0.05);
+}
+
+.card-elevation:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(27, 34, 54, 0.1);
+  border-color: rgba(228, 87, 46, 0.3);
+}
+
+/* Shared section heading */
+.section-title {
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  font-weight: 800;
+  color: var(--heading);
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  color: var(--body);
+  font-size: 1.05rem;
+  max-width: 620px;
+  margin-top: 0.5rem;
+}
