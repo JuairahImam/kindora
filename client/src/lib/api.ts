@@ -1,7 +1,21 @@
 import { ApiResponse, IEvent } from "@/types/event";
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://server-one-weld-92.vercel.app";
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      return "http://localhost:5050";
+    }
+  }
+  return (
+    process.env.NEXT_PUBLIC_API_URL ||
+    (typeof window !== "undefined" && window.location.hostname.endsWith(".vercel.app")
+      ? "https://server-one-weld-92.vercel.app"
+      : "http://localhost:5050")
+  );
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 // Helper to get stored auth token
 export const getStoredToken = (): string | null => {
@@ -29,7 +43,8 @@ export async function fetchApi<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const url = `${API_BASE_URL.replace(/\/$/, "")}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl.replace(/\/$/, "")}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
   const response = await fetch(url, {
     ...options,
