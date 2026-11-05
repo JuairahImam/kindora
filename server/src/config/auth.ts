@@ -69,6 +69,10 @@ export const auth = betterAuth({
     },
   },
 
+  account: {
+    skipStateCookieCheck: true,
+  },
+
   // MongoDB database
   database: mongodbAdapter(database, {
     client,
