@@ -6,9 +6,38 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Kindora — Social Development Events Platform",
+  title: {
+    default: "Kindora — Social Development Events Platform",
+    template: "%s | Kindora",
+  },
   description:
-    "Community-driven event management platform to discover, create, and join social development and humanitarian initiatives in your local area.",
+    "Kindora connects local citizens with grassroots social service initiatives across Dhaka and beyond. Discover cleanups, plantation drives, winter relief, and education workshops.",
+  keywords: [
+    "social development",
+    "community service",
+    "volunteering",
+    "Dhaka events",
+    "winter clothes distribution",
+    "tree plantation",
+    "humanitarian aid",
+    "Kindora",
+  ],
+  authors: [{ name: "Kindora Community Network" }],
+  openGraph: {
+    title: "Kindora — Social Development Events Platform",
+    description:
+      "Community-driven platform to create, join, and track social welfare events in your local area.",
+    url: "https://client-five-phi-98.vercel.app",
+    siteName: "Kindora",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kindora — Social Development Events Platform",
+    description:
+      "Small Acts. Big Changes. Join grassroots community initiatives in your area.",
+  },
 };
 
 export default function RootLayout({
