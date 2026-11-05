@@ -15,7 +15,7 @@ interface AuthContextType {
     password: string,
     photoURL?: string
   ) => Promise<{ success: boolean; message?: string }>;
-  loginWithGitHub: () => void;
+  loginWithGitHub: () => Promise<void> | void;
   logout: () => Promise<void>;
   updateUser: (user: Partial<IUser>) => void;
 }
@@ -241,10 +241,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // GitHub OAuth Login
-  const loginWithGitHub = () => {
-    const baseUrl = getApiBaseUrl();
-    const callbackURL = typeof window !== "undefined" ? window.location.origin : "";
-    window.location.href = `${baseUrl}/api/auth/sign-in/social?provider=github&callbackURL=${encodeURIComponent(callbackURL)}`;
+  const loginWithGitHub = async () => {
+    try {
+      const baseUrl = getApiBaseUrl();
+      const callbackURL = typeof window !== "undefined" ? window.location.origin : "";
+      
+      const res = await fetch(`${baseUrl}/api/auth/sign-in/social`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          provider: "github",
+          callbackURL,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        // Fallback to direct redirect if POST didn't return URL
+        window.location.href = `${baseUrl}/api/auth/sign-in/social?provider=github&callbackURL=${encodeURIComponent(callbackURL)}`;
+      }
+    } catch {
+      // Fallback on network/fetch error
+      const baseUrl = getApiBaseUrl();
+      const callbackURL = typeof window !== "undefined" ? window.location.origin : "";
+      window.location.href = `${baseUrl}/api/auth/sign-in/social?provider=github&callbackURL=${encodeURIComponent(callbackURL)}`;
+    }
   };
 
   // Logout

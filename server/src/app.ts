@@ -31,6 +31,38 @@ app.use(
   })
 );
 
+// GET Fallback for Social Sign-In (Redirects directly to OAuth provider)
+app.get("/api/auth/sign-in/social", async (req: Request, res: Response, next) => {
+  try {
+    const provider = (req.query.provider as string) || "github";
+    const callbackURL =
+      (req.query.callbackURL as string) ||
+      (req.headers.referer || "https://client-five-phi-98.vercel.app");
+
+    const response = await auth.api.signInSocial({
+      body: {
+        provider: provider as "github",
+        callbackURL,
+      },
+      asResponse: true,
+    });
+
+    const setCookie = response.headers.get("set-cookie");
+    if (setCookie) {
+      res.setHeader("set-cookie", setCookie);
+    }
+
+    const data = await response.json();
+    if (data?.url) {
+      res.redirect(data.url);
+    } else {
+      res.status(response.status).json(data);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Better Auth Handler
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
