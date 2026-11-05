@@ -47,9 +47,11 @@ app.get("/api/auth/sign-in/social", async (req: Request, res: Response, next) =>
       asResponse: true,
     });
 
-    const setCookie = response.headers.get("set-cookie");
-    if (setCookie) {
-      res.setHeader("set-cookie", setCookie);
+    const setCookies =
+      (response.headers as any).getSetCookie?.() ||
+      response.headers.get("set-cookie");
+    if (setCookies) {
+      res.setHeader("set-cookie", setCookies);
     }
 
     const data = await response.json();

@@ -43,11 +43,31 @@ export const trustedOrigins = Array.from(
 );
 
 // Better Auth configuration
+const isProduction =
+  process.env.NODE_ENV === "production" || baseURL.startsWith("https://");
+
 export const auth = betterAuth({
   baseURL,
   secret,
 
   trustedOrigins,
+
+  advanced: {
+    useSecureCookies: isProduction,
+    defaultCookieAttributes: {
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
+      httpOnly: true,
+    },
+    cookies: {
+      state: {
+        attributes: {
+          sameSite: isProduction ? "none" : "lax",
+          secure: isProduction,
+        },
+      },
+    },
+  },
 
   // MongoDB database
   database: mongodbAdapter(database, {
