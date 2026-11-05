@@ -93,3 +93,23 @@ export async function getEventById(id: string): Promise<IEvent | null> {
     return null;
   }
 }
+
+export async function getUserEvents(): Promise<IEvent[]> {
+  try {
+    const res = await fetchApi<ApiResponse<IEvent[]>>("/api/events/my-events");
+    return res.data || [];
+  } catch (error) {
+    console.error("Failed to fetch user events:", error);
+    return [];
+  }
+}
+
+export async function getJoinedEvents(): Promise<IEvent[]> {
+  try {
+    const res = await fetchApi<ApiResponse<IEvent[]>>("/api/events/joined-events");
+    return res.data || [];
+  } catch (error) {
+    console.error("Failed to fetch joined events:", error);
+    return [];
+  }
+}
